@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import File from "../../../../models/Files";
 import sequelize from "../../../../sequelize";
 
@@ -25,7 +25,7 @@ export async function GET() {
 }
 
 // 🟢 Handle POST Requests
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await initDB();
     const body = await req.json();
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
 }
 
 // 🟢 Handle PUT Requests
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
   try {
     await initDB();
     const { file_id, ...updateData } = await req.json();
@@ -66,7 +66,7 @@ export async function PUT(req: Request) {
 }
 
 // 🟢 Handle DELETE Requests
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   try {
     await initDB();
     const { file_id } = await req.json();
