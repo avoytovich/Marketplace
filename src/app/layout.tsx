@@ -1,12 +1,12 @@
-import { ReactNode } from 'react'
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import './globals.css'
+import { ReactNode } from 'react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Buy & Sell Platform',
   description: 'Connect buyers with sellers seamlessly.',
-}
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </ul>
           </nav>
         </header>
-        <main className="flex-1 py-6 px-4 bg-gradient-to-br from-blue-600 to-yellow-600">
+        <main className="flex-1 flex justify-center items-center py-6 px-4 bg-gradient-to-br from-blue-600 to-yellow-600">
           {children}
         </main>
         <footer className="text-center text-sm text-gray-700 p-4 border-t bg-gray-400">
@@ -45,5 +45,5 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </footer>
       </body>
     </html>
-  )
+  );
 }

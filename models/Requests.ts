@@ -6,32 +6,35 @@ import {
   ForeignKey,
   BelongsTo,
   HasMany,
-} from "sequelize-typescript";
+} from 'sequelize-typescript';
 
 // Dynamically import models before using them
-let User: typeof import("./Users").default;
-let File: typeof import("./Files").default;
-let Proposal: typeof import("./Proposals").default;
+let User: typeof import('./Users').default;
+let File: typeof import('./Files').default;
+let Proposal: typeof import('./Proposals').default;
 
 const initializeModels = async () => {
-  User = (await import("./Users")).default;
-  File = (await import("./Files")).default;
-  Proposal = (await import("./Proposals")).default;
+  User = (await import('./Users')).default;
+  File = (await import('./Files')).default;
+  Proposal = (await import('./Proposals')).default;
 };
 
 // Call initializeModels before using the Request model
 initializeModels().catch((error) => {
-  console.error("Error loading models", error);
+  console.error('Error loading models', error);
 });
 
-@Table({ tableName: "REQUESTS", timestamps: false })
+@Table({ tableName: 'REQUESTS', timestamps: false })
 export default class Request extends Model {
   @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
   declare request_id: number;
 
   // Use the dynamically imported User model with typeof to get its type
   @ForeignKey(() => User)
-  @Column(DataType.INTEGER)
+  @Column({
+    type: DataType.INTEGER,
+    onDelete: 'CASCADE', // Add this line
+  })
   declare user_id: number;
 
   @BelongsTo(() => User)
