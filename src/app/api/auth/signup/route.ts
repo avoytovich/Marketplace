@@ -49,14 +49,14 @@ export async function POST(req: Request) {
     });
 
     // Generate token
-    const token = generateToken({
+    const token = await generateToken({
       userId: user.user_id,
       email: user.email,
       role: user.role,
     });
 
-    // Return user data and token
-    return NextResponse.json(
+    // Create response
+    const response = NextResponse.json(
       {
         user: {
           id: user.user_id,
@@ -68,6 +68,19 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
+
+    // Set cookie
+    response.cookies.set({
+      name: 'token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
+
+    return response;
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json(

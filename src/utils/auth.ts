@@ -1,23 +1,47 @@
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { SignJWT, jwtVerify } from 'jose';
 import { NextRequest } from 'next/server';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // In production, always use environment variable
+// Use a consistent JWT secret
+const JWT_SECRET = new TextEncoder().encode(
+  'your-super-secret-jwt-key-marketplace-2024'
+);
 
 export interface JWTPayload {
   userId: number;
   email: string;
   role: string;
+  [key: string]: string | number; // Add index signature for jose compatibility
 }
 
-export const generateToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+export const generateToken = async (payload: JWTPayload): Promise<string> => {
+  try {
+    const token = await new SignJWT({ ...payload })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('24h')
+      .sign(JWT_SECRET);
+    return token;
+  } catch (error) {
+    console.error('Token generation error:', error);
+    throw error;
+  }
 };
 
-export const verifyToken = (token: string): JWTPayload => {
+export const verifyToken = async (token: string): Promise<JWTPayload> => {
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload;
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    // Type assertion after validating required fields
+    const jwtPayload = payload as {
+      userId: number;
+      email: string;
+      role: string;
+    };
+    if (!jwtPayload.userId || !jwtPayload.email || !jwtPayload.role) {
+      throw new Error('Invalid token payload');
+    }
+    return jwtPayload as JWTPayload;
   } catch (error) {
+    console.error('Token verification error:', error);
     throw new Error('Invalid token');
   }
 };
@@ -40,4 +64,14 @@ export const getTokenFromHeader = (req: NextRequest): string | null => {
     return authHeader.split(' ')[1];
   }
   return null;
+};
+
+export const getTokenFromCookie = (req: NextRequest): string | null => {
+  try {
+    const token = req.cookies.get('token')?.value;
+    return token || null;
+  } catch (error) {
+    console.error('Error getting token from cookie:', error);
+    return null;
+  }
 };

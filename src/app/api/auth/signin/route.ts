@@ -12,6 +12,7 @@ export async function POST(req: Request) {
   try {
     await initDB();
     const { email, password } = await req.json();
+    console.log('Signin attempt for email:', email);
 
     // Validate required fields
     if (!email || !password) {
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
     });
 
     if (!user) {
+      console.log('User not found:', email);
       return NextResponse.json(
         { message: 'Invalid credentials' },
         { status: 401 }
@@ -42,6 +44,7 @@ export async function POST(req: Request) {
     );
 
     if (!isValidPassword) {
+      console.log('Invalid password for user:', email);
       return NextResponse.json(
         { message: 'Invalid credentials' },
         { status: 401 }
@@ -50,6 +53,7 @@ export async function POST(req: Request) {
 
     // Check if user is active
     if (!user.is_activate) {
+      console.log('Inactive user attempted login:', email);
       return NextResponse.json(
         { message: 'Account is deactivated' },
         { status: 403 }
@@ -57,14 +61,15 @@ export async function POST(req: Request) {
     }
 
     // Generate token
-    const token = generateToken({
+    const token = await generateToken({
       userId: user.user_id,
       email: user.email,
       role: user.role,
     });
+    console.log('Generated token for user:', email);
 
-    // Return user data and token
-    return NextResponse.json(
+    // Create response
+    const response = NextResponse.json(
       {
         user: {
           id: user.user_id,
@@ -76,8 +81,22 @@ export async function POST(req: Request) {
       },
       { status: 200 }
     );
+
+    // Set cookie with strict security settings
+    response.cookies.set({
+      name: 'token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
+    console.log('Cookie set for user:', email);
+
+    return response;
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('Signin error:', error);
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }

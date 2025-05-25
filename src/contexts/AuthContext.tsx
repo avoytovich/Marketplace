@@ -12,7 +12,7 @@ interface AuthContextType {
   token: string | null;
   signin: (email: string, password: string) => Promise<void>;
   signup: (username: string, email: string, password: string) => Promise<void>;
-  signout: () => void;
+  signout: () => Promise<void>;
   isLoading: boolean;
   error: string | null;
 }
@@ -26,15 +26,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for saved auth data on mount
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
+    // Check if user is authenticated on mount
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check', {
+          method: 'GET',
+          credentials: 'include', // This is important for sending cookies
+        });
 
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-    }
-    setIsLoading(false);
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+          setToken(data.token);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   const signin = async (email: string, password: string) => {
@@ -47,6 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // This is important for receiving cookies
         body: JSON.stringify({ email, password }),
       });
 
@@ -58,8 +71,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(data.user);
       setToken(data.token);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       throw err;
@@ -78,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // This is important for receiving cookies
         body: JSON.stringify({ username, email, password }),
       });
 
@@ -89,8 +101,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(data.user);
       setToken(data.token);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       throw err;
@@ -99,11 +109,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  const signout = async () => {
+    try {
+      // Clear cookie on the server
+      await fetch('/api/auth/signout', {
+        method: 'POST',
+        credentials: 'include', // This is important for sending cookies
+      });
+
+      // Clear local state
+      setUser(null);
+      setToken(null);
+    } catch (error) {
+      console.error('Error during sign out:', error);
+    }
   };
 
   const value = {
