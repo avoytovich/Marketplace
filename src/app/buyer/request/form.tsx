@@ -5,6 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useState } from 'react';
 
+import { useAuth } from '@/contexts/AuthContext';
+
 const requestSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   category: z.string().min(1, 'Category is required'),
@@ -24,14 +26,24 @@ export default function BuyerRequestForm() {
   } = useForm<RequestFormData>({
     resolver: zodResolver(requestSchema),
   });
+  const { token, user } = useAuth();
 
   const onSubmit = async (data: RequestFormData) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/request', {
+      const payload = {
+        ...data,
+        location: 'USA', // Example static location, replace with actual logic if needed
+        status: 'open', // Default status for new requests
+        user_id: user?.id, // Assuming user object has an id
+      };
+      const res = await fetch('/api/requests', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Failed to submit request');
       alert('Request submitted successfully!');
