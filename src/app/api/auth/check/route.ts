@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
 
     // Get token from cookie
     const token = getTokenFromCookie(req);
-    console.log('Auth check - token from cookie:', token);
 
     if (!token) {
       return NextResponse.json(
@@ -25,15 +24,16 @@ export async function GET(req: NextRequest) {
 
     // Verify token
     try {
-      const decoded = verifyToken(token);
-      console.log('Auth check - decoded token:', decoded);
-
+      const decoded = await verifyToken(token);
       // Get user from database
-      const user = await User.findOne({
-        where: {
-          user_id: decoded.userId,
-        },
-      });
+      let user;
+      if (decoded) {
+        user = await User.findOne({
+          where: {
+            user_id: decoded.userId,
+          },
+        });
+      }
 
       if (!user) {
         console.log('Auth check - user not found for id:', decoded.userId);

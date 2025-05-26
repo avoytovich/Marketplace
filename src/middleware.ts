@@ -19,11 +19,9 @@ export async function middleware(request: NextRequest) {
   ];
 
   const path = request.nextUrl.pathname;
-  console.log('Accessing path:', path);
 
   // Check if the path is public
   if (publicPaths.includes(path)) {
-    console.log('Public path accessed:', path);
     return NextResponse.next();
   }
 
@@ -33,12 +31,7 @@ export async function middleware(request: NextRequest) {
     const headerToken = getTokenFromHeader(request);
     const token = cookieToken || headerToken;
 
-    console.log('Auth check for path:', path);
-    console.log('Cookie token present:', !!cookieToken);
-    console.log('Header token present:', !!headerToken);
-
     if (!token) {
-      console.log('No token found for path:', path);
       return new NextResponse(
         JSON.stringify({ message: 'Authentication required' }),
         { status: 401, headers: { 'content-type': 'application/json' } }
@@ -48,9 +41,6 @@ export async function middleware(request: NextRequest) {
     // Verify token
     try {
       const decoded = await verifyTokenEdge(token);
-      console.log('Token verified successfully for path:', path);
-      console.log('User ID:', decoded.userId);
-      console.log('User role:', decoded.role);
 
       // Add user info to request headers
       const requestHeaders = new Headers(request.headers);
@@ -64,9 +54,6 @@ export async function middleware(request: NextRequest) {
         },
       });
     } catch (verifyError) {
-      console.error('Token verification failed for path:', path);
-      console.error('Verification error:', verifyError);
-
       // Clear the invalid token cookie
       const response = new NextResponse(
         JSON.stringify({ message: 'Invalid token' }),
@@ -86,9 +73,6 @@ export async function middleware(request: NextRequest) {
       return response;
     }
   } catch (error) {
-    console.error('Middleware error for path:', path);
-    console.error('Error details:', error);
-
     return new NextResponse(
       JSON.stringify({ message: 'Authentication failed' }),
       {
