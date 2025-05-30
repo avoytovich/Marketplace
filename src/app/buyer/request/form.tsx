@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const requestSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   category: z.string().min(1, 'Category is required'),
+  location: z.string().min(2, 'Location is required'),
   budget_min: z.coerce.number().positive('Must be a positive number'),
   budget_max: z.coerce.number().positive('Must be a positive number'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
@@ -33,7 +34,6 @@ export default function BuyerRequestForm() {
     try {
       const payload = {
         ...data,
-        location: 'USA', // Example static location, replace with actual logic if needed
         status: 'open', // Default status for new requests
         user_id: user?.id, // Assuming user object has an id
       };
@@ -79,6 +79,20 @@ export default function BuyerRequestForm() {
           {errors.category && (
             <p className="text-red-500 text-sm mt-1">
               {errors.category.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block font-medium text-gray-700">Location</label>
+          <input
+            {...register('location')}
+            className="mt-1 w-full border rounded p-2"
+            placeholder="Enter your location"
+          />
+          {errors.location && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.location.message}
             </p>
           )}
         </div>

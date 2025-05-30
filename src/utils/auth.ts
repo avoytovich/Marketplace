@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 
 // Use a consistent JWT secret
 const JWT_SECRET = new TextEncoder().encode(
-  'your-super-secret-jwt-key-marketplace-2024'
+  process.env.JWT_SECRET || 'fallback-secret'
 );
 
 export interface JWTPayload {
