@@ -3,8 +3,8 @@ import type { NextRequest } from 'next/server';
 import {
   getTokenFromHeader,
   getTokenFromCookie,
-  verifyTokenEdge,
-} from './utils/edge-auth';
+  verifyToken,
+} from './utils/auth';
 
 export async function middleware(request: NextRequest) {
   // List of public paths that don't require authentication
@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
 
     // Verify token
     try {
-      const decoded = await verifyTokenEdge(token);
+      const decoded = await verifyToken(token);
 
       // Add user info to request headers
       const requestHeaders = new Headers(request.headers);
