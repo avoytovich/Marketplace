@@ -19,7 +19,7 @@ export default function Navigation() {
           {user ? (
             <>
               <li>
-                <Link href="/buyer/request" className="hover:underline">
+                <Link href="/request" className="hover:underline">
                   Post Request
                 </Link>
               </li>
