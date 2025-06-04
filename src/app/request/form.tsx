@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -28,6 +29,7 @@ export default function BuyerRequestForm() {
     resolver: zodResolver(requestSchema),
   });
   const { token, user } = useAuth();
+  const router = useRouter();
 
   const onSubmit = async (data: RequestFormData) => {
     setLoading(true);
@@ -52,6 +54,7 @@ export default function BuyerRequestForm() {
       alert('Error submitting request');
     } finally {
       setLoading(false);
+      router.push('/discovery'); // Redirect to discovery page after submission
     }
   };
 

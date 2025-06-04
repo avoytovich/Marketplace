@@ -9,11 +9,13 @@ import {
 export async function middleware(request: NextRequest) {
   // List of public paths that don't require authentication
   const publicPaths = [
+    '/api/requests',
     '/api/auth/signin',
     '/api/auth/signup',
     '/api/auth/check',
     '/api/auth/signout',
     '/',
+    '/discovery',
     '/signin',
     '/signup',
   ];
