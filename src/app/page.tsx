@@ -1,6 +1,15 @@
+'use client';
+
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 
 export default function HomePage() {
+
+   useEffect(() => {
+    // Call the API route to create the table
+    fetch('/api/init-table');
+  }, []);
+
   return (
     <section className="text-center py-20">
       <h1 className="text-4xl font-bold mb-4">Welcome to BuySellHub</h1>
