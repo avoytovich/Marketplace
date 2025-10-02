@@ -1,17 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { neon } from '@neondatabase/serverless';
 import { getTokenFromCookie, verifyToken } from '../../../../utils/auth';
-import User from '../../../../../models/Users';
-import sequelize from '../../../../../sequelize';
-
-// Ensure DB is synced
-async function initDB() {
-  await sequelize.sync();
-}
 
 export async function GET(req: NextRequest) {
   try {
-    await initDB();
-
     // Get token from cookie
     const token = getTokenFromCookie(req);
 
@@ -25,14 +17,15 @@ export async function GET(req: NextRequest) {
     // Verify token
     try {
       const decoded = await verifyToken(token);
-      // Get user from database
+
       let user;
       if (decoded) {
-        user = await User.findOne({
-          where: {
-            user_id: decoded.userId,
-          },
-        });
+        const sql = neon(`${process.env.DATABASE_URL}`);
+        const result = await sql.query(
+          'SELECT user_id, username, email, role FROM users WHERE user_id = $1 LIMIT 1',
+          [decoded.userId]
+        );
+        user = result[0];
       }
 
       if (!user) {
@@ -58,7 +51,7 @@ export async function GET(req: NextRequest) {
       throw verifyError;
     }
   } catch (error) {
-    console.error('Auth check error:', error);
+    console.log('Auth check error:', error);
     return NextResponse.json(
       { message: 'Authentication failed' },
       { status: 401 }

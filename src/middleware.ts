@@ -10,6 +10,7 @@ export async function middleware(request: NextRequest) {
   // List of public paths that don't require authentication
   const publicPaths = [
     '/api/requests',
+    '/api/init-tables',
     '/api/auth/signin',
     '/api/auth/signup',
     '/api/auth/check',
@@ -21,6 +22,7 @@ export async function middleware(request: NextRequest) {
   ];
 
   const path = request.nextUrl.pathname;
+  console.log('Middleware - Incoming request for path:', path);
 
   // Check if the path is public
   if (publicPaths.includes(path)) {
@@ -75,6 +77,7 @@ export async function middleware(request: NextRequest) {
       return response;
     }
   } catch (error) {
+    console.error('Middleware error:', error);
     return new NextResponse(
       JSON.stringify({ message: 'Authentication failed' }),
       {

@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function Navigation() {
   const { user, signout } = useAuth();
+  console.log('Navigation render, user:', user);
 
   return (
     <header className="p-4 bg-gray-800 text-white shadow">
