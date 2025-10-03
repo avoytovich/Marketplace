@@ -59,7 +59,7 @@ function groupData(rows: any[]) {
 // 🟢 Handle GET Requests
 export async function GET() {
   try {
-    const sql = neon(`${process.env.DATABASE_URL}`);
+    const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
 
     // JOIN requests with users, files, and proposals
     const result = await sql.query(`
