@@ -1,16 +1,9 @@
+import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
-import User from '../../../../../models/Users';
 import { hashPassword, generateToken } from '../../../../utils/auth';
-import sequelize from '../../../../../sequelize';
-
-// Ensure DB is synced
-async function initDB() {
-  await sequelize.sync();
-}
 
 export async function POST(req: Request) {
   try {
-    await initDB();
     const { username, email, password, role = 'user' } = await req.json();
 
     // Validate required fields
@@ -21,14 +14,14 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({
-      where: {
-        email,
-      },
-    });
+    const sql = neon(`${process.env.DATABASE_URL}`);
 
-    if (existingUser) {
+    // Check if user already exists
+    const userCheck = await sql.query(
+      'SELECT user_id FROM users WHERE email = $1 LIMIT 1',
+      [email]
+    );
+    if (userCheck.length > 0) {
       return NextResponse.json(
         { message: 'User already exists' },
         { status: 400 }
@@ -38,15 +31,17 @@ export async function POST(req: Request) {
     // Hash password
     const hashedPassword = await hashPassword(password);
 
-    // Create user
-    const user = await User.create({
-      username,
-      email,
-      password_hash: hashedPassword,
-      role,
-      is_activate: true,
-      created_at: new Date(),
-    });
+    // Insert new user (returns all columns, including auto-generated user_id)
+    const createUserResult = await sql.query(
+      `
+      INSERT INTO users (username, email, password_hash, role, is_activate, created_at)
+      VALUES ($1, $2, $3, $4, true, NOW())
+      RETURNING user_id, username, email, role
+      `,
+      [username, email, hashedPassword, role]
+    );
+
+    const user = createUserResult[0];
 
     // Generate token
     const token = await generateToken({
@@ -55,7 +50,7 @@ export async function POST(req: Request) {
       role: user.role,
     });
 
-    // Create response
+    // Create response with user data and token
     const response = NextResponse.json(
       {
         user: {

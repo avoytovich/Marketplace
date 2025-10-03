@@ -7,7 +7,7 @@ export default function HomePage() {
 
    useEffect(() => {
     // Call the API route to create the table
-    fetch('/api/init-table');
+    fetch('/api/init-tables');
   }, []);
 
   return (
