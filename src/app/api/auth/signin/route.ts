@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     }
 
     // Find user by email
-    const sql = neon(`${process.env.DATABASE_URL}`);
+    const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
     const result = await sql.query(`
       SELECT * FROM users WHERE email = $1 LIMIT 1
     `, [email]);

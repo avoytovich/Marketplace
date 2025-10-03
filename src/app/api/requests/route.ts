@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const sql = neon(`${process.env.DATABASE_URL}`);
+    const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
 
     // Insert new request & return the new row
     const result = await sql.query(
