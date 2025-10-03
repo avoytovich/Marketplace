@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
       let user;
       if (decoded) {
-        const sql = neon(`${process.env.DATABASE_URL}`);
+        const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
         const result = await sql.query(
           'SELECT user_id, username, email, role FROM users WHERE user_id = $1 LIMIT 1',
           [decoded.userId]

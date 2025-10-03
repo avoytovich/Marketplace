@@ -3,7 +3,7 @@ import { neon } from '@neondatabase/serverless';
 // Create the table (run once, e.g., in a migration script)
 export async function createUsersTable() {
   'use server';
-  const sql = neon(`${process.env.DATABASE_URL}`);
+  const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
   await sql.query(`
     CREATE TABLE IF NOT EXISTS users (
       user_id SERIAL PRIMARY KEY,
@@ -22,7 +22,7 @@ export async function createUsersTable() {
 // Create the "requests" table in Neon
 export async function createRequestsTable() {
   'use server';
-  const sql = neon(`${process.env.DATABASE_URL}`);
+  const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
   await sql.query(` 
     CREATE TABLE IF NOT EXISTS requests (
       request_id SERIAL PRIMARY KEY,
@@ -42,7 +42,7 @@ export async function createRequestsTable() {
 // Create the "proposals" table in Neon
 export async function createProposalsTable() {
   'use server';
-  const sql = neon(`${process.env.DATABASE_URL}`);
+  const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
   await sql.query(`
     CREATE TABLE IF NOT EXISTS proposals (
       proposal_id SERIAL PRIMARY KEY,
@@ -61,7 +61,7 @@ export async function createProposalsTable() {
 // Create the "files" table with FK to requests
 export async function createFilesTable() {
   'use server';
-  const sql = neon(`${process.env.DATABASE_URL}`);
+  const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
   await sql.query(`
     CREATE TABLE IF NOT EXISTS files (
       file_id SERIAL PRIMARY KEY,
@@ -75,7 +75,7 @@ export async function createFilesTable() {
 // Create the "reviews" table with FK to users (from and to)
 export async function createReviewsTable() {
   'use server';
-  const sql = neon(`${process.env.DATABASE_URL}`);
+  const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
   await sql.query(`
     CREATE TABLE IF NOT EXISTS reviews (
       review_id SERIAL PRIMARY KEY,
@@ -91,7 +91,7 @@ export async function createReviewsTable() {
 // Create the "messages" table with FKs to users and proposals
 export async function createMessagesTable() {
   'use server';
-  const sql = neon(`${process.env.DATABASE_URL}`);
+  const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
   await sql.query(`
     CREATE TABLE IF NOT EXISTS messages (
       message_id SERIAL PRIMARY KEY,
@@ -108,7 +108,7 @@ export async function createMessagesTable() {
 // Create the "transactions" table with FKs to proposals and users
 export async function createTransactionsTable() {
   'use server';
-  const sql = neon(`${process.env.DATABASE_URL}`);
+  const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
   await sql.query(`
     CREATE TABLE IF NOT EXISTS transactions (
       transaction_id SERIAL PRIMARY KEY,

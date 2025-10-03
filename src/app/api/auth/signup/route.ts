@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const sql = neon(`${process.env.DATABASE_URL}`);
+    const sql = neon(`${process.env.DATABASEDATABASE_URL}`);
 
     // Check if user already exists
     const userCheck = await sql.query(
