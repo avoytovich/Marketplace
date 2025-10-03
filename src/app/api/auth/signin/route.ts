@@ -1,16 +1,9 @@
 import { NextResponse } from 'next/server';
-import User from '../../../../../models/Users';
+import { neon } from '@neondatabase/serverless';
 import { comparePasswords, generateToken } from '../../../../utils/auth';
-import sequelize from '../../../../../sequelize';
-
-// Ensure DB is synced
-async function initDB() {
-  await sequelize.sync();
-}
 
 export async function POST(req: Request) {
   try {
-    await initDB();
     const { email, password } = await req.json();
     console.log('Signin attempt for email:', email);
 
@@ -22,12 +15,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Find user
-    const user = await User.findOne({
-      where: {
-        email,
-      },
-    });
+    // Find user by email
+    const sql = neon(`${process.env.DATABASE_URL}`);
+    const result = await sql.query(`
+      SELECT * FROM users WHERE email = $1 LIMIT 1
+    `, [email]);
+
+    const user = result[0];
 
     if (!user) {
       console.log('User not found:', email);
@@ -68,7 +62,7 @@ export async function POST(req: Request) {
     });
     console.log('Generated token for user:', email);
 
-    // Create response
+    // Prepare response
     const response = NextResponse.json(
       {
         user: {

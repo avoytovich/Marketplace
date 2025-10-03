@@ -6,15 +6,15 @@ export async function POST() {
     { status: 200, headers: { 'content-type': 'application/json' } }
   );
 
-  // Clear the token cookie
+  // Clear the token cookie by expiring it immediately
   response.cookies.set({
     name: 'token',
     value: '',
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    path: '/', // Add this to ensure cookie is deleted across all routes
-    maxAge: 0, // Expire immediately
+    path: '/',     // Ensure cookie is deleted site-wide
+    maxAge: 0,     // Expire immediately
   });
 
   return response;

@@ -1,5 +1,4 @@
 import { neon } from '@neondatabase/serverless';
-import { NOW } from 'sequelize';
 
 // Create the table (run once, e.g., in a migration script)
 export async function createUsersTable() {
@@ -11,7 +10,7 @@ export async function createUsersTable() {
       username TEXT UNIQUE NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      role TEXT NOT NULL CHECK (role IN ('buyer', 'seller')),
+      role TEXT NOT NULL CHECK (role IN ('buyer', 'seller', 'user', 'admin')),
       is_activate BOOLEAN DEFAULT FALSE,
       profile_picture BYTEA,
       bio TEXT,
