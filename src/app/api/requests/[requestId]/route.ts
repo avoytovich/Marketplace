@@ -95,9 +95,8 @@ function groupRequestData(rows: any[]) {
   return request;
 }
 
-export async function GET(req: NextRequest, context: { params: { requestId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { requestId: string } }) {
   try {
-    const params = await context.params;
     const requestId = parseInt(params.requestId);
     if (isNaN(requestId)) {
       return NextResponse.json(
