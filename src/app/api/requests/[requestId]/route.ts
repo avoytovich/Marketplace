@@ -95,7 +95,7 @@ function groupRequestData(rows: any[]) {
   return request;
 }
 
-export async function GET(req: NextRequest, context: { params: { requestId: any } }) {
+export async function GET(req: NextRequest, context: any) {
   try {
     const  params = await context.params;
     const requestId = parseInt(params.requestId);
