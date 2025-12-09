@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { neon } from '@neondatabase/serverless';
+import { RouteHandlerContext } from 'next/dist/server/web/types';
 
 // Define TypeScript interfaces for the request structure
 interface User {
@@ -95,9 +96,10 @@ function groupRequestData(rows: any[]) {
   return request;
 }
 
-export async function GET(req: NextRequest, { params }: { params: { requestId: string } }) {
+export async function GET(req: NextRequest, context: RouteHandlerContext) {
   try {
-    const requestId = parseInt(params.requestId);
+    const { params } = context;
+    const requestId = parseInt(params.requestId as string);
     if (isNaN(requestId)) {
       return NextResponse.json(
         { message: "Invalid requestId" },
