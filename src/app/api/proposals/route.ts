@@ -1,96 +1,42 @@
-// import { NextResponse } from "next/server";
-// import Proposal from "../../../../models/Proposals";
-// import sequelize from "../../../../sequelize";
+import { NextRequest, NextResponse } from 'next/server';
+import { neon } from '@neondatabase/serverless';
 
-// // Ensure DB is synced (optional for production)
-// async function initDB() {
-//   await sequelize.sync();
-// }
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
 
-// // 🟢 Handle GET Requests
-// export async function GET() {
-//   try {
-//     await initDB();
-//     const proposals = await Proposal.findAll({
-//       include: ["request", "seller", "transactions", "messages"], // Include associated data
-//     });
-//     return NextResponse.json(proposals, { status: 200 });
-//   } catch (error) {
-//     console.error("API Error:", error);
-//     return NextResponse.json(
-//       { message: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
+    const { request_id, seller_id, price, delivery_time, message, portfolio_url } = body;
 
-// // 🟢 Handle POST Requests
-// export async function POST(req: Request) {
-//   try {
-//     await initDB();
-//     const body = await req.json();
-//     const newProposal = await Proposal.create(body);
-//     return NextResponse.json(newProposal, { status: 201 });
-//   } catch (error) {
-//     console.error("API Error:", error);
-//     return NextResponse.json(
-//       { message: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
+    if (!request_id || !seller_id || !price || !delivery_time || !message) {
+      return NextResponse.json(
+        { message: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
 
-// // 🟢 Handle PUT Requests
-// export async function PUT(req: Request) {
-//   try {
-//     await initDB();
-//     const { proposal_id, ...updateData } = await req.json();
+    const sql = neon(`${process.env.DATABASE_DATABASE_URL}`);
 
-//     const proposal = await Proposal.findByPk(proposal_id);
-//     if (!proposal) {
-//       return NextResponse.json(
-//         { message: "Proposal not found" },
-//         { status: 404 }
-//       );
-//     }
+    // Insert the proposal into the database
+    const result = await sql.query(
+      `INSERT INTO proposals (request_id, seller_id, price, estimated_time, message, portfolio_url, status, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pending', NOW())
+       RETURNING *`,
+      [request_id, seller_id, price, delivery_time, message, portfolio_url]
+    );
 
-//     await proposal.update(updateData);
-//     return NextResponse.json(proposal, { status: 200 });
-//   } catch (error) {
-//     console.error("API Error:", error);
-//     return NextResponse.json(
-//       { message: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
+    if (result.length === 0) {
+      return NextResponse.json(
+        { message: 'Failed to create proposal' },
+        { status: 500 }
+      );
+    }
 
-// // 🟢 Handle DELETE Requests
-// export async function DELETE(req: Request) {
-//   try {
-//     await initDB();
-//     const { proposal_id } = await req.json();
-
-//     const proposalToDelete = await Proposal.findByPk(proposal_id);
-//     if (!proposalToDelete) {
-//       return NextResponse.json(
-//         { message: "Proposal not found" },
-//         { status: 404 }
-//       );
-//     }
-
-//     await proposalToDelete.destroy();
-//     return NextResponse.json(
-//       { message: "Proposal deleted successfully" },
-//       { status: 204 }
-//     );
-//   } catch (error) {
-//     console.error("API Error:", error);
-//     return NextResponse.json(
-//       { message: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-export {};
+    return NextResponse.json(result[0], { status: 201 });
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}

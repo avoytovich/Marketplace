@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface BuyerRequest {
   request_id: number;
@@ -62,9 +63,17 @@ export default function BuyerDiscoveryPage() {
               <p className="text-sm text-gray-700 mb-2 line-clamp-3">
                 {req.description}
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 mb-4 text-right italic">
                 Posted on {new Date(req.created_at).toLocaleDateString()}
               </p>
+              <div className="text-center">
+                <Link
+                  href={`/seller/proposal/${req.request_id}`}
+                  className="bg-blue-600 text-white text-center px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  Create Proposal
+                </Link>
+              </div>
             </div>
           ))}
         </div>
