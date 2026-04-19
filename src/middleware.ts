@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   console.log('Middleware - Incoming request for path:', path);
-
+  
   // Check if the path is public
   if (publicPaths.includes(path)) {
     return NextResponse.next();
@@ -92,6 +92,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/api/:path*',
-    '/((?!_next/static|favicon.ico|logo.png|images|signin|signup).*)',
+    '/((?!_next/static|favicon\\.ico|logo\\.png|images|signin|signup).*)',
   ],
 };
