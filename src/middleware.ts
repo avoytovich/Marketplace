@@ -15,6 +15,7 @@ export async function middleware(request: NextRequest) {
     '/api/auth/signup',
     '/api/auth/check',
     '/api/auth/signout',
+    '/api/ollama-sql',
     '/',
     '/discovery',
     '/signin',
