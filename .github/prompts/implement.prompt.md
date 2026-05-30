@@ -9,6 +9,9 @@ If no plan is provided, ask for /plan first before making changes.
 Dependency rule:
 - /implement depends on /plan output
 - If no plan is provided, request /plan before making changes
+- Prefer implementation of plans that have been reviewed
+- If a review exists and the decision is NEEDS CLARIFICATION or REJECTED, do not proceed
+- Request clarification first
 
 Rules:
 - Follow the implementation plan strictly

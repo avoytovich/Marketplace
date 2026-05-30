@@ -58,3 +58,10 @@ Unit tests, integration tests, manual verification.
 # Open Questions
 
 Anything that needs clarification.
+
+Only include questions that materially affect implementation,
+architecture, dependencies, user experience, security,
+or project scope.
+
+Do not create questions merely because multiple valid
+implementation approaches exist.
