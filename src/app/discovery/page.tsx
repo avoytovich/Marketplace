@@ -4,9 +4,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
+import { useAuth } from '../../contexts/AuthContext';
+
 interface BuyerRequest {
   request_id: number;
-  user_id: number;
   title: string;
   category: string;
   budget_min: number;
@@ -14,17 +15,24 @@ interface BuyerRequest {
   description: string;
   location: string;
   status: 'open' | 'in_progress' | 'done' | 'cancelled';
+  user: {
+    user_id: number;
+    username: string;
+    email: string;
+    profile_picture: string | null;
+  };
   created_at: string;
 }
 
 export default function BuyerDiscoveryPage() {
   const [requests, setRequests] = useState<BuyerRequest[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const { user } = useAuth();
+  
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await fetch('/api/requests'); // Replace with your API route
+        const res = await fetch('/api/requests');
         const data = await res.json();
         setRequests(data);
       } catch (error) {
@@ -67,12 +75,21 @@ export default function BuyerDiscoveryPage() {
                 Posted on {new Date(req.created_at).toLocaleDateString()}
               </p>
               <div className="text-center">
-                <Link
-                  href={`/seller/proposal/${req.request_id}`}
-                  className="bg-blue-600 text-white text-center px-4 py-2 rounded hover:bg-blue-700"
-                >
-                  Create Proposal
-                </Link>
+                {req.user.user_id === user?.id ? (
+                  <Link
+                    href={`/buyer/requests/${req.request_id}/proposals`}
+                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                  >
+                    View Proposals
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/seller/proposal/${req.request_id}`}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  >
+                    Create Proposal
+                  </Link>
+                )}
               </div>
             </div>
           ))}

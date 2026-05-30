@@ -10,7 +10,7 @@ import { useAuth } from '../../../../contexts/AuthContext';
 
 const proposalSchema = z.object({
   price: z.coerce.number().positive('Price must be positive'),
-  delivery_time: z.string().min(1, 'Delivery time is required'),
+  estimated_time: z.string().min(1, 'Estimated time is required'), // Renamed delivery_time to estimated_time
   message: z.string().min(10, 'Message must be at least 10 characters'),
   portfolio_url: z.string().url('Enter a valid URL').optional(),
 });
@@ -83,14 +83,14 @@ export default function SellerProposalPage() {
 
         <div>
           <label className="block font-medium text-gray-700">Estimated Delivery Time</label>
-          <select {...register('delivery_time')} className="mt-1 w-full border rounded p-2">
+          <select {...register('estimated_time')} className="mt-1 w-full border rounded p-2">
             <option value="">Select...</option>
             <option value="1 day">1 day</option>
             <option value="3 days">3 days</option>
             <option value="1 week">1 week</option>
             <option value="2 weeks">2 weeks</option>
           </select>
-          {errors.delivery_time && <p className="text-red-500 text-sm mt-1">{errors.delivery_time.message}</p>}
+          {errors.estimated_time && <p className="text-red-500 text-sm mt-1">{errors.estimated_time.message}</p>}
         </div>
 
         <div>

@@ -1,80 +1,58 @@
-// import { NextResponse } from 'next/server';
-// import User from '../../../../models/Users';
-// import sequelize from '../../../../sequelize'; // Import your sequelize instance
+import { NextRequest, NextResponse } from 'next/server';
+import { neon } from '@neondatabase/serverless';
 
-// Ensure DB is synced (optional for production)
-// async function initDB() {
-//   await sequelize.sync();
-// }
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const seller_id = searchParams.get('seller_id');
 
-// 🟢 Handle GET Requests
-// export async function GET() {
-//   await initDB();
-//   const users = await User.findAll();
-//   return NextResponse.json(users, { status: 200 });
-// }
+    if (!seller_id) {
+      return NextResponse.json(
+        { message: 'Missing seller_id parameter' },
+        { status: 400 }
+      );
+    }
 
-// 🟢 Handle POST Requests
-// export async function POST(req: Request) {
-//   try {
-//     await initDB();
-//     const body = await req.json(); // Extract JSON body
-//     const newUser = await User.create(body);
-//     return NextResponse.json(newUser, { status: 201 });
-//   } catch (error) {
-//     console.error('API Error:', error);
-//     return NextResponse.json(
-//       { message: 'Internal Server Error' },
-//       { status: 500 }
-//     );
-//   }
-// }
+    if (!process.env.DATABASE_DATABASE_URL) {
+      console.error('DATABASE_DATABASE_URL is not set');
+      return NextResponse.json(
+        { message: 'Database connection error' },
+        { status: 500 }
+      );
+    }
 
-// 🟢 Handle PUT Requests
-// export async function PUT(req: Request) {
-//   try {
-//     await initDB();
-//     const { id, ...updateData } = await req.json();
+    let sql;
+    try {
+      sql = neon(`${process.env.DATABASE_DATABASE_URL}`); // Initialize the database connection
+    } catch (error) {
+      console.error('Failed to initialize database connection:', error);
+      return NextResponse.json(
+        { message: 'Database connection initialization failed' },
+        { status: 500 }
+      );
+    }
 
-//     const user = await User.findByPk(id);
-//     if (!user) {
-//       return NextResponse.json({ message: 'User not found' }, { status: 404 });
-//     }
+    const userId = req.headers.get('user-id');
 
-//     await user.update(updateData);
-//     return NextResponse.json(user, { status: 200 });
-//   } catch (error) {
-//     console.error('API Error:', error);
-//     return NextResponse.json(
-//       { message: 'Internal Server Error' },
-//       { status: 500 }
-//     );
-//   }
-// }
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'Unauthorized access' },
+        { status: 401 }
+      );
+    }
 
-// 🟢 Handle DELETE Requests
-// export async function DELETE(req: Request) {
-//   try {
-//     await initDB();
-//     const { userId } = await req.json();
+    // Fetch proposals where the user isn't the seller (don't propose for yourself) and matches the request_id
+    const result = await sql.query(
+      `SELECT * FROM users
+       WHERE user_id = $1`,
+      [seller_id]
+    );
 
-//     const userToDelete = await User.findByPk(userId);
-//     if (!userToDelete) {
-//       return NextResponse.json({ message: 'User not found' }, { status: 404 });
-//     }
-
-//     await userToDelete.destroy();
-//     return NextResponse.json(
-//       { message: 'User deleted successfully' },
-//       { status: 200 }
-//     );
-//   } catch (error) {
-//     console.error('API Error:', error);
-//     return NextResponse.json(
-//       { message: 'Internal Server Error' },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-export {};
+    return NextResponse.json(result, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
