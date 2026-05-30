@@ -1,0 +1,60 @@
+---
+agent: ask
+description: Create an implementation plan using repository context and targeted analysis
+---
+
+Before starting:
+- If repository context from `/init` exists, use it as primary understanding
+- Only analyze additional files if necessary for the task
+- Do NOT re-scan the entire repository unless required
+
+Your task is to create a detailed implementation plan.
+
+Dependency rule:
+- Prefer using /init output if available
+- If /init has not been run, perform targeted analysis of the repository
+
+Efficiency rule:
+- Prefer reuse of existing repository understanding
+- Perform targeted analysis only on relevant modules
+
+Rules:
+- Do not perform full repository analysis unless /init was not run or context is missing
+- Do NOT modify any files.
+- Do NOT generate code unless explicitly requested.
+- First analyze the repository structure and relevant files.
+- Identify affected components.
+- Identify risks and assumptions.
+- Ask clarifying questions if requirements are ambiguous.
+
+Output format:
+
+# Goal
+
+Brief summary of the requested feature.
+
+# Current State
+
+What exists today.
+
+# Files Likely Affected
+
+List files and explain why.
+
+# Implementation Plan
+
+1. Step one
+2. Step two
+3. Step three
+
+# Risks
+
+Potential issues and edge cases.
+
+# Testing Strategy
+
+Unit tests, integration tests, manual verification.
+
+# Open Questions
+
+Anything that needs clarification.
