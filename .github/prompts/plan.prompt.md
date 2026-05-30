@@ -9,6 +9,10 @@ Before starting:
 - Do NOT re-scan the entire repository unless required
 
 Your task is to create a detailed implementation plan.
+Do not ask whether to proceed with implementation,
+diagnostics, installation, or setup.
+
+Your responsibility is to create a plan only.
 
 Dependency rule:
 - Prefer using /init output if available
@@ -65,3 +69,8 @@ or project scope.
 
 Do not create questions merely because multiple valid
 implementation approaches exist.
+
+Open Questions should only include items that require
+user decisions or business requirements clarification.
+
+Do not ask operational next-step questions.
