@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
-import { chat } from "@/lib/ollama";
+import { chat, isOllamaAvailable } from "@/lib/ollama";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_DATABASE_URL });
 
@@ -42,6 +42,20 @@ transactions(transaction_id SERIAL PRIMARY KEY, proposal_id INTEGER NOT NULL REF
 
 export async function POST(req: Request) {
   const { question } = await req.json();
+
+  // Check if Ollama is available
+  const available = await isOllamaAvailable();
+  if (!available) {
+    return NextResponse.json(
+      {
+        error: "Ollama AI service is not available. Please ensure Ollama is installed and running (ollama serve). See documentation for setup instructions.",
+        question,
+        sql: "",
+        explanation: ""
+      },
+      { status: 503 }
+    );
+  }
 
   const llmText = await chat({
     messages: [

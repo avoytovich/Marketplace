@@ -9,13 +9,36 @@ export default function HomePage() {
   const [userInput, setUserInput] = useState('');
   const [queryResult, setQueryResult] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [ollamaAvailable, setOllamaAvailable] = useState(true);
 
   const { user } = useAuth();
 
   useEffect(() => {
-    // Call the API route to create the table
     fetch('/api/init-tables');
   }, []);
+
+  // Check Ollama availability on component mount
+  useEffect(() => {
+    const checkOllama = async () => {
+      try {
+        const response = await fetch('/api/ollama-sql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: 'SELECT 1' }),
+        });
+        if (response.status === 503) {
+          setOllamaAvailable(false);
+        } else {
+          setOllamaAvailable(true);
+        }
+      } catch {
+        setOllamaAvailable(false);
+      }
+    };
+    if (user) {
+      checkOllama();
+    }
+  }, [user]);
 
   const handleGenerateSQL = async () => {
     try {
@@ -29,9 +52,13 @@ export default function HomePage() {
       if (data.error) {
         setErrorMessage(`Error: ${data.error}`);
         setQueryResult(null);
+        if (response.status === 503) {
+          setOllamaAvailable(false);
+        }
       } else {
         setErrorMessage('');
         setQueryResult(data);
+        setOllamaAvailable(true);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -40,7 +67,6 @@ export default function HomePage() {
     }
   };
 
-  // Helper to render a table from rows array
   function renderTable(rows: any[]) {
     if (!rows || rows.length === 0) return <div>No data found.</div>;
     const headers = Object.keys(rows[0]);
@@ -86,21 +112,31 @@ export default function HomePage() {
       </Link>
       {user && (
         <div className="mt-24 mb-2 flex justify-center items-center">
+          {!ollamaAvailable && (
+            <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded max-w-2xl text-left">
+              <p className="text-yellow-800 font-semibold">⚠️ AI Search Unavailable</p>
+              <p className="text-yellow-700 text-sm mt-2">
+                The AI search feature requires Ollama to be installed and running locally. 
+                Please set up Ollama to use natural language search. See documentation for setup instructions.
+              </p>
+            </div>
+          )}
           <div>
             <textarea
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               placeholder="Enter your question"
-            className="border px-4 py-2 rounded w-1/2 h-32 w-full resize-none"
-          />
-          <button
-            onClick={handleGenerateSQL}
-            className="ml-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-          >
-            Search with AI Assistant
-          </button>
+              className="border px-4 py-2 rounded w-1/2 h-32 w-full resize-none"
+            />
+            <button
+              onClick={handleGenerateSQL}
+              className="ml-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+              disabled={!ollamaAvailable}
+            >
+              Search with AI Assistant
+            </button>
+          </div>
         </div>
-      </div>
       )}
       {(errorMessage || queryResult) && user && (
         <div className="mt-4 mb-4 p-4 bg-gray-100 rounded text-left max-w-3xl mx-auto">

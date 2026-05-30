@@ -12,6 +12,12 @@ Dependency rule:
 - Prefer implementation of plans that have been reviewed
 - If a review exists and the decision is NEEDS CLARIFICATION or REJECTED, do not proceed
 - Request clarification first
+- Implementation requires explicit user approval.
+- Do not begin modifying files merely because clarifications were provided.
+- Wait for one of:
+  - /implement
+  - "Implement the approved plan"
+  - "Proceed with implementation"
 
 Rules:
 - Follow the implementation plan strictly

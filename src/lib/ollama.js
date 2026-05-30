@@ -2,6 +2,18 @@ export const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? "http://localhost:
 export const CHAT_MODEL = process.env.OLLAMA_CHAT_MODEL ?? "llama3.1:8b";
 export const EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? "nomic-embed-text";
 
+export async function isOllamaAvailable() {
+  try {
+    const r = await fetch(`${OLLAMA_BASE_URL}/api/tags`, { 
+      method: "GET",
+      signal: AbortSignal.timeout(5000) // 5 second timeout
+    });
+    return r.ok;
+  } catch {
+    return false;
+  }
+}
+
 function messagesToPrompt(messages) {
   return messages
     .map(m => {

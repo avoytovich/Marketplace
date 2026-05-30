@@ -25,7 +25,16 @@ Full-stack Next.js 15 app using the **App Router**. There is no separate backend
 
 **Data model** (7 tables): Users → Requests (buyer postings) → Proposals (seller offers) → Messages (per-proposal thread) → Transactions → Reviews → Files (request attachments).
 
-**AI feature**: `src/lib/ollama.js` calls a locally running Ollama instance (model `llama3.2:3b`) to translate natural language into SQL. The `/api/ollama-sql` route exposes this. The home page (`src/app/page.tsx`) has an AI search bar wired to this endpoint.
+**AI feature**: `src/lib/ollama.js` calls a locally running Ollama instance (model `llama3.1:8b` by default) to translate natural language into SQL. The `/api/ollama-sql` route exposes this. The home page (`src/app/page.tsx`) has an AI search bar wired to this endpoint.
+
+**Ollama Setup** (required for AI search to work):
+1. Install Ollama from [ollama.ai](https://ollama.ai)
+2. Download the model: `ollama pull llama3.1:8b`
+3. Run the Ollama server: `ollama serve` (listens on `http://localhost:11434`)
+4. The app will automatically detect when Ollama is available and show the AI search feature
+5. If Ollama is unavailable, users will see a warning but the app continues to function
+
+Optional: Set `OLLAMA_BASE_URL` and `OLLAMA_CHAT_MODEL` in `.env` to use a different Ollama endpoint or model. Defaults are `http://localhost:11434` and `llama3.1:8b`.
 
 ## Key Conventions
 
@@ -37,6 +46,6 @@ Full-stack Next.js 15 app using the **App Router**. There is no separate backend
 ## Environment
 
 Required `.env` variables:
-- `DATABASE_URL` — Neon Postgres pooler connection string
+- `DATABASE_URL` — Neon Postgres pooler connection string (`DATABASE_DATABASE_URL` in current `.env`)
 - `JWT_SECRET` — secret for signing JWTs (falls back to a hardcoded default if missing — always set explicitly)
-- Ollama must be running locally for AI search features to work
+- Optional: `OLLAMA_BASE_URL`, `OLLAMA_CHAT_MODEL`, `OLLAMA_EMBED_MODEL` — Ollama configuration (see setup instructions above)

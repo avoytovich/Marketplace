@@ -67,3 +67,20 @@ One of:
 - REJECTED
 
 ## Recommended Next Step
+
+After receiving answers to required clarifications:
+- Update the review decision
+- Do NOT implement changes
+- Do NOT modify files
+- Wait for an explicit /implement command
+
+Providing answers to questions is not implementation approval.
+
+If clarifications are received:
+- Record them.
+- Re-evaluate the plan.
+- Do NOT modify files.
+- Do NOT start implementation.
+- Wait for an explicit /implement command.
+
+Clarification responses are not approval to edit files.
